@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receptionist Dashboard | Hospital Management System</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .hospital-header {
+      background-color: #0d6efd;
+      color: white;
+      padding: 15px 30px;
+    }
+    .hospital-logo {
+      height: 50px;
+      width: 50px;
+      object-fit: contain;
+      margin-right: 15px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Header -->
+  <header class="hospital-header d-flex align-items-center">
+    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" alt="Hospital Logo" class="hospital-logo">
+    <div>
+      <h3 class="mb-0">CityCare Multispeciality Hospital</h3>
+      <small>Receptionist Dashboard</small>
+    </div>
+  </header>
+
+  <div class="container py-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="text-primary mb-4">Hi, <span id="receptionistName">Receptionist</span> 👋</h4>
+
+        <!-- Appointment Search -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Enter Appointment No:</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="apptNumber" placeholder="Enter appointment number">
+            <button class="btn btn-primary" type="button" id="fetchBtn">Enter</button>
+          </div>
+        </div>
+
+        <!-- Appointment Details -->
+        <div id="apptDetails" class="d-none">
+          <h5 class="text-secondary mt-4 mb-3">Appointment Details</h5>
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Doctor</th>
+                <th>Department</th>
+                <th>Insurance?</th>
+                <th>Which Insurance</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="pName">—</td>
+                <td id="pDoctor">—</td>
+                <td id="pDept">—</td>
+                <td id="pIns">—</td>
+                <td id="pWhichIns">—</td>
+                <td id="pTime">—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Fee & Verification -->
+          <div class="row g-3 mt-3">
+            <div class="col-md-4">
+              <label class="form-label">Total Fees:</label>
+              <input type="text" class="form-control" id="totalFees" placeholder="Enter amount">
+            </div>
+            <div class="col-md-8 d-flex align-items-center mt-4">
+              <div class="form-check me-4">
+                <input class="form-check-input" type="checkbox" id="detailsChecked">
+                <label class="form-check-label" for="detailsChecked">Details Checked</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="paymentDone">
+                <label class="form-check-label" for="paymentDone">Payment Completed</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="mt-4">
+            <button class="btn btn-success px-4" id="submitBtn">Submit</button>
+          </div>
+
+          <!-- Status Message -->
+          <div class="alert alert-info mt-4 d-none" id="statusMsg">
+            Appointment Status: <strong class="text-success">Paid</strong>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dummy appointment data (replace this with DB connection later)
+    const dummyData = {
+      "APT001": {
+        name: "Riya Sharma",
+        doctor: "Dr. Rajan Maruthanayagam",
+        dept: "Cardiology",
+        insurance: "Yes",
+        whichInsurance: "Star Health",
+        time: "10:30 AM"
+      },
+      "APT002": {
+        name: "Aman Verma",
+        doctor: "Dr. Sneha Patel",
+        dept: "Orthopedics",
+        insurance: "No",
+        whichInsurance: "—",
+        time: "11:15 AM"
+      }
+    };
+
+    document.getElementById("fetchBtn").addEventListener("click", () => {
+      const apptNo = document.getElementById("apptNumber").value.trim().toUpperCase();
+      const detailsDiv = document.getElementById("apptDetails");
+      const data = dummyData[apptNo];
+
+      if (data) {
+        detailsDiv.classList.remove("d-none");
+        document.getElementById("pName").innerText = data.name;
+        document.getElementById("pDoctor").innerText = data.doctor;
+        document.getElementById("pDept").innerText = data.dept;
+        document.getElementById("pIns").innerText = data.insurance;
+        document.getElementById("pWhichIns").innerText = data.whichInsurance;
+        document.getElementById("pTime").innerText = data.time;
+      } else {
+        detailsDiv.classList.add("d-none");
+        alert("Appointment not found!");
+      }
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const checked = document.getElementById("detailsChecked").checked;
+      const payment = document.getElementById("paymentDone").checked;
+      const fees = document.getElementById("totalFees").value.trim();
+
+      if (!checked || !payment || fees === "") {
+        alert("Please complete all fields before submitting.");
+        return;
+      }
+
+      document.getElementById("statusMsg").classList.remove("d-none");
+    });
+  </script>
+</body>
+</html>
