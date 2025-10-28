@@ -47,7 +47,7 @@
         <h4 class="text-primary mb-4">Hi, <span id="receptionistName">Receptionist</span> 👋</h4>
 
         <!-- Search by phone -->
-        <form method="get" action="{% url 'patient-by-phone' %}">
+        <form method="get" action="{% url 'register_or_edit_patient' %}">
           <div class="input-group">
             <input type="text" class="form-control" name="phone" placeholder="Enter phone number" required>
             <button class="btn btn-primary" type="submit">Search</button>

@@ -67,60 +67,67 @@ def get_doctors(request):
     doctors = Staff.objects.filter(role='doctor', department=department)
     data = list(doctors.values('staff_id','full_name'))   # adjust field names as per model
     return JsonResponse(data, safe=False)
-
-def patient_by_phone(request):
-    phone_number = request.GET.get("phone")
-    if not phone_number:
-        return JsonResponse({"error": "Phone number required"}, status=400)
-    try:
-        patient = (
-            Patient.objects
-            .prefetch_related(
-                'insurance_records__insurance'
-            )
-            .get(phone=phone_number)
-        )
-        ins_map = patient.insurance_records.first()
-        insurance_data = None
-        if ins_map:
-            insurance_data = {
-                "policy_number_from_card": ins_map.policy_number_from_card,
-                "valid_to": ins_map.valid_to.strftime("%Y-%m-%d") if ins_map.valid_to else None,
-                "company_and_policy_name": ins_map.insurance.company_and_policy_name,
-                "discount_percent": ins_map.insurance.discount_percent,
-            }
-
-        return JsonResponse({
-            "exists": True,
-            "patient": {
-                "id": patient.patient_id,
-                "full_name": patient.full_name,
-                "phone": patient.phone,
-                "dob": patient.dob.strftime("%Y-%m-%d") if patient.dob else None,
-                "age": patient.age,
-                "gender": patient.gender,
-                "address": patient.address,
-                "nationality": patient.nationality,
-                "occupation": patient.occupation,
-                "date_of_registration": patient.date_of_registration.strftime("%Y-%m-%d"),
-                "medical_history": patient.medical_history,
-                "blood_group": patient.blood_group,
-            },
-            "insurance": insurance_data
-        })
-    
-    except Patient.DoesNotExist:
-        return JsonResponse({"exists": False})
     
 def register_or_edit_patient(request):
-    """Handles both new registration and editing existing patient."""
-    phone = request.GET.get("phone")  # for pre-filling, if any
+    # Handles both new registration and editing existing patient
+    phone = request.GET.get("phone")
 
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
+            # Save Patient and Insurance Map
             patient = form.save()
-            return redirect('success_page')  # or render a success message
+
+            # STEP 1: Get latest appointment for this patient
+            appointment = (
+                Appointment.objects
+                .filter(phone=patient.phone)
+                .order_by('-preferred_date', '-preferred_time')
+                .first()
+            )
+
+            if not appointment:
+                # No appointment found → you can show a message
+                return HttpResponse("<h3 style='text-align:center; margin-top:40px;'>No appointments found for this phone number.</h3>")
+
+            # STEP 2: Determine base fee from department
+            dept = appointment.department.lower()
+            if dept == 'cardiology':
+                fees = 750
+            elif dept == 'ent':
+                fees = 650
+            elif dept == 'neurology':
+                fees = 550
+            elif dept == 'orthopedics':
+                fees = 450
+            elif dept == 'pediatrics':
+                fees = 350
+            else:
+                fees = 300
+
+            # STEP 3: Find insurance info (if any)
+            insurance_map = PatientInsuranceMap.objects.filter(patient=patient).first()
+
+            discount = 0
+            insurance_name = None
+
+            if insurance_map:
+                policy = insurance_map.insurance
+                discount = policy.discount_percent
+                insurance_name = policy.company_and_policy_name
+
+            discount_amount = fees * discount / 100
+            final_amount = fees - discount_amount
+
+            # STEP 4: Render payments page
+            return render(request, 'payments.html', {
+                'appointment': appointment,
+                'fees': fees,
+                'insurance_name': insurance_name,
+                'discount': discount,
+                'discount_amount': round(discount_amount, 2),
+                'final_amount': round(final_amount, 2),
+            })
     else:
         # Prefill form if phone exists
         form = None
@@ -135,4 +142,33 @@ def register_or_edit_patient(request):
 
     return render(request, 'receptionist.html', {"form": form})
 
+def complete_payment(request, appt_id):
+    """Handles payment completion and updates appointment + payment tables."""
+    if request.method == "POST":
+        try:
+            appointment = Appointment.objects.get(pk=appt_id)
+        except Appointment.DoesNotExist:
+            return HttpResponse("<h3 style='text-align:center; margin-top:40px;'>Invalid appointment ID.</h3>")
+
+        amount_original = float(request.POST.get("amount_original", 0))
+        discount_amount = float(request.POST.get("discount_amount", 0))
+        amount_paid = float(request.POST.get("amount_paid", 0))
+        payment_method = request.POST.get("payment_method")
+
+        # ✅ Save payment record
+        Payment.objects.create(
+            appointment=appointment,
+            amount_original=amount_original,
+            discount_amount=discount_amount,
+            amount_paid=amount_paid,
+            payment_method=payment_method,
+        )
+
+        # ✅ Update appointment status
+        appointment.status = "confirmed"
+        appointment.save()
+
+        return HttpResponse("<h3 style='text-align:center; margin-top:40px;'>Payment successful!</h3>")
+
+    return HttpResponse("<h3 style='text-align:center; margin-top:40px;'>Invalid request method.</h3>")
 
