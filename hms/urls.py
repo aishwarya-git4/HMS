@@ -29,6 +29,7 @@ urlpatterns = [
     path('get-doctors/', views.get_doctors, name='get_doctors'),
     path("register_or_edit_patient/",views.register_or_edit_patient, name="register_or_edit_patient"),
     path("complete-payment/<int:appt_id>/", views.complete_payment, name="complete-payment")
+    
 
 
 

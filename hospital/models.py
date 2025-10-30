@@ -202,6 +202,8 @@ class InsurancePolicy(models.Model):
     discount_percent = models.PositiveSmallIntegerField(
         help_text="Enter % value like 10, 20, 50"
     )
+    def __str__(self):
+        return self.company_and_policy_name
 
 class PatientInsuranceMap(models.Model):
     id = models.AutoField(primary_key=True)

@@ -11,7 +11,50 @@ def index(request):
 def manager(request):
     return render(request,'manager.html')
 def doctor(request):
-    return render(request,'doctor.html')
+    """Doctor dashboard with consultation form"""
+    staff_id = request.session.get("staff_id")
+
+    if not staff_id:
+        return redirect("staff_login")
+
+    doctor = Staff.objects.get(staff_id=staff_id)
+
+    if request.method == "POST":
+        patient_id = request.POST.get("patient_id")
+        symptoms = request.POST.get("symptoms")
+        diagnosis = request.POST.get("diagnosis")
+        prescription = request.POST.get("prescription")
+        notes = request.POST.get("notes")
+
+        try:
+            # ✅ Get the patient by ID
+            patient = Patient.objects.get(patient_id=patient_id)
+        except Patient.DoesNotExist:
+            return HttpResponse("<h3 style='text-align:center;'>Invalid patient ID</h3>")
+
+        # ✅ Create Consultation record
+        Consultation.objects.create(
+            patient=patient,
+            doctor=doctor,
+            symptoms=symptoms,
+            diagnosis=diagnosis,
+            prescription=prescription,
+            notes=notes,
+        )
+
+        # ✅ Find the latest appointment using the phone number (since no FK exists)
+        latest_appointment = Appointment.objects.filter(
+            phone=patient.phone
+        ).order_by('-preferred_date').first()
+
+        if latest_appointment:
+            latest_appointment.status = "visited"
+            latest_appointment.save()
+
+        return HttpResponse("<h3 style='text-align:center;'>Consultation saved successfully!</h3>")
+
+    return render(request, "doctor.html", {"doctor": doctor})
+
 def receptionist(request):
     return render(request,'receptionist.html')
 def staff_login(request):
@@ -39,8 +82,10 @@ def staff_login(request):
                 "error": "Incorrect password",
                 "role": role,
             })
-
         
+        request.session["staff_id"] = staff_auth.staff.staff_id
+        request.session["staff_role"] = staff_auth.staff.role
+
         if role == "doctor":
             return redirect("doctor")
         elif role == "manager":
