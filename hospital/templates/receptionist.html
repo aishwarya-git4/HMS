@@ -49,7 +49,7 @@
         <!-- Search by phone -->
         <form method="get" action="{% url 'register_or_edit_patient' %}">
           <div class="input-group">
-            <input type="text" class="form-control" name="phone" placeholder="Enter phone number" required>
+            <input type="text" class="form-control" name="phone" placeholder="Enter phone number" required value="{{ request.GET.phone|default:'' }}">
             <button class="btn btn-primary" type="submit">Search</button>
           </div>
         </form>
@@ -69,16 +69,16 @@
           <div class="mb-4">
             <h5 class="section-title">Patient Details</h5>
             <div class="row g-3">
-              <div class="col-md-6">{{ form.full_name.label_tag }} {{ form.full_name }}</div>
-              <div class="col-md-6">{{ form.phone.label_tag }} {{ form.phone }}</div>
-              <div class="col-md-4">{{ form.dob.label_tag }} {{ form.dob }}</div>
-              <div class="col-md-4">{{ form.age.label_tag }} {{ form.age }}</div>
-              <div class="col-md-4">{{ form.gender.label_tag }} {{ form.gender }}</div>
-              <div class="col-md-12">{{ form.address.label_tag }} {{ form.address }}</div>
-              <div class="col-md-6">{{ form.nationality.label_tag }} {{ form.nationality }}</div>
-              <div class="col-md-6">{{ form.occupation.label_tag }} {{ form.occupation }}</div>
-              <div class="col-md-6">{{ form.blood_group.label_tag }} {{ form.blood_group }}</div>
-              <div class="col-md-12">{{ form.medical_history.label_tag }} {{ form.medical_history }}</div>
+              <div class="col-12">{{ form.full_name.label_tag }} {{ form.full_name }}</div>
+              <div class="col-12">{{ form.phone.label_tag }} {{ form.phone }}</div>
+              <div class="col-12">{{ form.dob.label_tag }} {{ form.dob }}</div>
+              <div class="col-12">{{ form.age.label_tag }} {{ form.age }}</div>
+              <div class="col-12">{{ form.gender.label_tag }} {{ form.gender }}</div>
+              <div class="col-12">{{ form.address.label_tag }} {{ form.address }}</div>
+              <div class="col-12">{{ form.nationality.label_tag }} {{ form.nationality }}</div>
+              <div class="col-12">{{ form.occupation.label_tag }} {{ form.occupation }}</div>
+              <div class="col-12">{{ form.blood_group.label_tag }} {{ form.blood_group }}</div>
+              <div class="col-12">{{ form.medical_history.label_tag }} {{ form.medical_history }}</div>
             </div>
           </div>
 
@@ -86,9 +86,9 @@
           <div class="mb-4">
             <h5 class="section-title">Insurance Details (Optional)</h5>
             <div class="row g-3">
-              <div class="col-md-6">{{ form.insurance_policy.label_tag }} {{ form.insurance_policy }}</div>
-              <div class="col-md-6">{{ form.policy_number_from_card.label_tag }} {{ form.policy_number_from_card }}</div>
-              <div class="col-md-6">{{ form.valid_to.label_tag }} {{ form.valid_to }}</div>
+              <div class="col-12">{{ form.insurance_policy.label_tag }} {{ form.insurance_policy }}</div>
+              <div class="col-12">{{ form.policy_number_from_card.label_tag }} {{ form.policy_number_from_card }}</div>
+              <div class="col-12">{{ form.valid_to.label_tag }} {{ form.valid_to }}</div>
             </div>
           </div>
 

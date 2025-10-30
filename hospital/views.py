@@ -126,12 +126,12 @@ def register_or_edit_patient(request):
             # STEP 1: Get latest appointment for this patient
             appointment = (
                 Appointment.objects
-                .filter(phone=patient.phone)
+                .filter(phone=patient.phone, status='pending')
                 .order_by('-preferred_date', '-preferred_time')
                 .first()
             )
 
-            if not appointment:
+            if not appointment:#just an extra check
                 # No appointment found → you can show a message
                 return HttpResponse("<h3 style='text-align:center; margin-top:40px;'>No appointments found for this phone number.</h3>")
 
@@ -177,6 +177,16 @@ def register_or_edit_patient(request):
         # Prefill form if phone exists
         form = None
         if phone:
+            appointment = (
+                Appointment.objects
+                .filter(phone=phone, status='pending')
+                .order_by('-preferred_date', '-preferred_time')
+                .first()
+            )
+
+            if not appointment:
+                # No appointment found → you can show a message
+                return HttpResponse("<h3 style='text-align:center; margin-top:40px;'>No appointments found for this phone number.</h3>")
             try:
                 patient = Patient.objects.prefetch_related('insurance_records__insurance').get(phone=phone)
                 form = RegistrationForm.from_patient(patient)
