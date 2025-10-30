@@ -8,6 +8,20 @@ from .models import *
 def index(request):
     return render(request,'index.html')
 
+def patient(request):
+    return render(request,'patient.html')
+
+def cancel_booking(request):
+    apptid=request.GET.get('apptid')
+    if apptid:
+        deleted, _ = Appointment.objects.filter(appt_id=apptid).delete()
+        if deleted:
+            return HttpResponse(f"Appointment ID {apptid} deleted successfully.")
+        else:
+            return HttpResponse("No appointment found with that ID.", status=404)        
+    else:
+        return render(request,'cancel_booking.html')
+
 def manager(request):
     return render(request,'manager.html')
 def doctor(request):
@@ -100,8 +114,8 @@ def user_booking(request):
     if request.method == "POST":
         form = AppointmentForm(request.POST)
         if form.is_valid():
-            form.save()          # saves to database
-            return HttpResponse('Appointment booked')  # or render a thank-you page
+            appointment = form.save()  # save and get the created object
+            return HttpResponse(f"Appointment booked successfully! Your Appointment ID is {appointment.appt_id}.")
     else:
         form = AppointmentForm()
 
