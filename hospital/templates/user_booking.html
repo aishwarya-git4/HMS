@@ -38,40 +38,24 @@
         <h3 class="text-primary mb-4">Request for an Appointment</h3>
         <p class="text-muted">Kindly fill in the details below carefully. Our team will review them and reach out to you to confirm your appointment.</p>
         
-        <form>
+        <form method="POST">
+          {% csrf_token %}
           <!-- Patient Details -->
           <h5 class="mt-4 mb-3 text-secondary">Patient Details</h5>
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label">First Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" placeholder="First Name" required>
+              <label class="form-label">Full Name <span class="text-danger">*</span></label>
+              <input type="text" name="full_name" class="form-control" placeholder="Full Name" required value="{{ form.full_name.value|default:'' }}">
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Last Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" placeholder="Last Name" required>
-            </div>
+    
             <div class="col-md-6">
               <label class="form-label">Contact Number <span class="text-danger">*</span></label>
-              <input type="tel" class="form-control" placeholder="e.g. 9876543210" required>
+              <input type="tel" name="phone" class="form-control" placeholder="e.g. 9876543210" required value="{{ form.phone.value|default:'' }}">
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Email <span class="text-danger">*</span></label>
-              <input type="email" class="form-control" placeholder="e.g. example@email.com" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Aadhar Number <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" placeholder="Enter Aadhar number" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Insurance Available?</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="insurance" id="insuranceYes" value="Yes">
-                <label class="form-check-label" for="insuranceYes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="insurance" id="insuranceNo" value="No" checked>
-                <label class="form-check-label" for="insuranceNo">No</label>
-              </div>
+              <input type="email" name="email" class="form-control" placeholder="e.g. example@email.com" required value="{{ form.email.value|default:'' }}">
             </div>
           </div>
 
@@ -79,50 +63,29 @@
           <h5 class="mt-5 mb-3 text-secondary">Visit & Appointment Preferences</h5>
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label">Payment Type <span class="text-danger">*</span></label>
-              <select class="form-select" required>
-                <option selected disabled>Select Payment Type</option>
-                <option>Cash</option>
-                <option>Credit/Debit Card</option>
-                <option>UPI</option>
-                <option>Insurance</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Branch <span class="text-danger">*</span></label>
-              <select class="form-select" required>
-                <option selected disabled>Select Branch</option>
-                <option>City Hospital - Downtown</option>
-                <option>City Hospital - North Wing</option>
-              </select>
-            </div>
-            <div class="col-md-6">
               <label class="form-label">Department <span class="text-danger">*</span></label>
-              <select class="form-select" required>
+              <select class="form-select" name="department" id="dept-select" required>
                 <option selected disabled>Select Department</option>
-                <option>Cardiology</option>
-                <option>Orthopedics</option>
-                <option>Pediatrics</option>
-                <option>ENT</option>
-                <option>Neurology</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="ENT">ENT</option>
+                <option value="Neurology">Neurology</option>
               </select>
             </div>
             <div class="col-md-6">
               <label class="form-label">Doctor Name <span class="text-danger">*</span></label>
-              <select class="form-select" required>
+              <select class="form-select" name="doctor" id="doctor-select" required>
                 <option selected disabled>Select Doctor</option>
-                <option>Dr. Rajan Maruthanayagam</option>
-                <option>Dr. Sneha Patel</option>
-                <option>Dr. Aman Verma</option>
               </select>
             </div>
             <div class="col-md-6">
               <label class="form-label">Preferred Appointment Date <span class="text-danger">*</span></label>
-              <input type="date" class="form-control" required>
+              <input type="date" name="preferred_date" class="form-control" required>
             </div>
             <div class="col-md-6">
               <label class="form-label">Preferred Time <span class="text-danger">*</span></label>
-              <input type="time" class="form-control" required>
+              <input type="time" name="preferred_time" class="form-control" required>
             </div>
           </div>
 
@@ -135,6 +98,7 @@
           <!-- Note -->
           <div class="alert alert-info mt-4" role="alert">
             Please reproduce your government ID proof at your appointment desk.
+            <p id="wait-msg" style="display:none; color:blue;">Appointment booked.</p>
           </div>
         </form>
       </div>
@@ -142,5 +106,24 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    
+
+document.getElementById("dept-select").addEventListener("change", function () {
+
+    let dept = this.value;
+    fetch(`/get-doctors/?department=${dept}`)
+      .then(res => res.json())
+      .then(data => {
+          let docSelect = document.getElementById("doctor-select");
+          docSelect.innerHTML = '<option disabled selected>Select Doctor</option>';
+          data.forEach(d => {
+              docSelect.innerHTML += `<option value="${d.staff_id}">${d.full_name}</option>`;
+          });
+      });
+
+});
+
+  </script>
 </body>
 </html>

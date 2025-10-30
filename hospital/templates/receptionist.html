@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Receptionist Dashboard | Hospital Management System</title>
-  <!-- Bootstrap 5 CDN -->
+  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     .hospital-header {
       background-color: #0d6efd;
@@ -17,6 +18,13 @@
       width: 50px;
       object-fit: contain;
       margin-right: 15px;
+    }
+    .section-title {
+      border-bottom: 2px solid #0d6efd;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: #0d6efd;
     }
   </style>
 </head>
@@ -32,131 +40,69 @@
   </header>
 
   <div class="container py-5">
-    <div class="card shadow-sm">
+
+    <!-- Greeting Card -->
+    <div class="card shadow-sm mb-4">
       <div class="card-body">
         <h4 class="text-primary mb-4">Hi, <span id="receptionistName">Receptionist</span> 👋</h4>
 
-        <!-- Appointment Search -->
-        <div class="mb-4">
-          <label class="form-label fw-semibold">Enter Appointment No:</label>
+        <!-- Search by phone -->
+        <form method="get" action="{% url 'register_or_edit_patient' %}">
           <div class="input-group">
-            <input type="text" class="form-control" id="apptNumber" placeholder="Enter appointment number">
-            <button class="btn btn-primary" type="button" id="fetchBtn">Enter</button>
+            <input type="text" class="form-control" name="phone" placeholder="Enter phone number" required value="{{ request.GET.phone|default:'' }}">
+            <button class="btn btn-primary" type="submit">Search</button>
           </div>
-        </div>
-
-        <!-- Appointment Details -->
-        <div id="apptDetails" class="d-none">
-          <h5 class="text-secondary mt-4 mb-3">Appointment Details</h5>
-          <table class="table table-bordered">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Doctor</th>
-                <th>Department</th>
-                <th>Insurance?</th>
-                <th>Which Insurance</th>
-                <th>Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td id="pName">—</td>
-                <td id="pDoctor">—</td>
-                <td id="pDept">—</td>
-                <td id="pIns">—</td>
-                <td id="pWhichIns">—</td>
-                <td id="pTime">—</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- Fee & Verification -->
-          <div class="row g-3 mt-3">
-            <div class="col-md-4">
-              <label class="form-label">Total Fees:</label>
-              <input type="text" class="form-control" id="totalFees" placeholder="Enter amount">
-            </div>
-            <div class="col-md-8 d-flex align-items-center mt-4">
-              <div class="form-check me-4">
-                <input class="form-check-input" type="checkbox" id="detailsChecked">
-                <label class="form-check-label" for="detailsChecked">Details Checked</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="paymentDone">
-                <label class="form-check-label" for="paymentDone">Payment Completed</label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Submit -->
-          <div class="mt-4">
-            <button class="btn btn-success px-4" id="submitBtn">Submit</button>
-          </div>
-
-          <!-- Status Message -->
-          <div class="alert alert-info mt-4 d-none" id="statusMsg">
-            Appointment Status: <strong class="text-success">Paid</strong>
-          </div>
-        </div>
+        </form>
 
       </div>
     </div>
+
+    <!-- Patient Registration / Edit Form -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="text-primary mb-4">Patient Registration / Edit Form</h4>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <!-- Patient Details -->
+          <div class="mb-4">
+            <h5 class="section-title">Patient Details</h5>
+            <div class="row g-3">
+              <div class="col-12">{{ form.full_name.label_tag }} {{ form.full_name }}</div>
+              <div class="col-12">{{ form.phone.label_tag }} {{ form.phone }}</div>
+              <div class="col-12">{{ form.dob.label_tag }} {{ form.dob }}</div>
+              <div class="col-12">{{ form.age.label_tag }} {{ form.age }}</div>
+              <div class="col-12">{{ form.gender.label_tag }} {{ form.gender }}</div>
+              <div class="col-12">{{ form.address.label_tag }} {{ form.address }}</div>
+              <div class="col-12">{{ form.nationality.label_tag }} {{ form.nationality }}</div>
+              <div class="col-12">{{ form.occupation.label_tag }} {{ form.occupation }}</div>
+              <div class="col-12">{{ form.blood_group.label_tag }} {{ form.blood_group }}</div>
+              <div class="col-12">{{ form.medical_history.label_tag }} {{ form.medical_history }}</div>
+            </div>
+          </div>
+
+          <!-- Insurance Details -->
+          <div class="mb-4">
+            <h5 class="section-title">Insurance Details (Optional)</h5>
+            <div class="row g-3">
+              <div class="col-12">{{ form.insurance_policy.label_tag }} {{ form.insurance_policy }}</div>
+              <div class="col-12">{{ form.policy_number_from_card.label_tag }} {{ form.policy_number_from_card }}</div>
+              <div class="col-12">{{ form.valid_to.label_tag }} {{ form.valid_to }}</div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-5">Save</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
   </div>
 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Dummy appointment data (replace this with DB connection later)
-    const dummyData = {
-      "APT001": {
-        name: "Riya Sharma",
-        doctor: "Dr. Rajan Maruthanayagam",
-        dept: "Cardiology",
-        insurance: "Yes",
-        whichInsurance: "Star Health",
-        time: "10:30 AM"
-      },
-      "APT002": {
-        name: "Aman Verma",
-        doctor: "Dr. Sneha Patel",
-        dept: "Orthopedics",
-        insurance: "No",
-        whichInsurance: "—",
-        time: "11:15 AM"
-      }
-    };
-
-    document.getElementById("fetchBtn").addEventListener("click", () => {
-      const apptNo = document.getElementById("apptNumber").value.trim().toUpperCase();
-      const detailsDiv = document.getElementById("apptDetails");
-      const data = dummyData[apptNo];
-
-      if (data) {
-        detailsDiv.classList.remove("d-none");
-        document.getElementById("pName").innerText = data.name;
-        document.getElementById("pDoctor").innerText = data.doctor;
-        document.getElementById("pDept").innerText = data.dept;
-        document.getElementById("pIns").innerText = data.insurance;
-        document.getElementById("pWhichIns").innerText = data.whichInsurance;
-        document.getElementById("pTime").innerText = data.time;
-      } else {
-        detailsDiv.classList.add("d-none");
-        alert("Appointment not found!");
-      }
-    });
-
-    document.getElementById("submitBtn").addEventListener("click", () => {
-      const checked = document.getElementById("detailsChecked").checked;
-      const payment = document.getElementById("paymentDone").checked;
-      const fees = document.getElementById("totalFees").value.trim();
-
-      if (!checked || !payment || fees === "") {
-        alert("Please complete all fields before submitting.");
-        return;
-      }
-
-      document.getElementById("statusMsg").classList.remove("d-none");
-    });
-  </script>
 </body>
 </html>
