@@ -15,15 +15,15 @@ class RegistrationForm(forms.Form):
     # --- Patient fields ---
     full_name = forms.CharField(max_length=120, label="Full Name")
     phone = forms.CharField(max_length=15, label="Phone")
-    dob = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    age = forms.IntegerField(required=False)
+    dob = forms.DateField(required=True, widget=forms.DateInput(attrs={'type': 'date'}))
+    age = forms.IntegerField(required=True)
     gender = forms.ChoiceField(
         choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')],
         required=False
     )
-    address = forms.CharField(widget=forms.Textarea, required=False)
-    nationality = forms.CharField(max_length=50, required=False)
-    occupation = forms.CharField(max_length=100, required=False)
+    address = forms.CharField(widget=forms.Textarea, required=True)
+    nationality = forms.CharField(max_length=50, required=True)
+    occupation = forms.CharField(max_length=100, required=True)
     medical_history = forms.CharField(widget=forms.Textarea, required=False)
     blood_group = forms.ChoiceField(
         choices=[
@@ -32,7 +32,7 @@ class RegistrationForm(forms.Form):
             ('AB+', 'AB+'), ('AB-', 'AB-'),
             ('O+', 'O+'), ('O-', 'O-'),
         ],
-        required=False
+        required=True
     )
 
     # --- Insurance fields ---
