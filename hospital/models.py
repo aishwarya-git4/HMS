@@ -28,7 +28,7 @@ class Patient(models.Model):
         max_length=100,
         null=False, blank=False
     )
-    date_of_registration = models.DateTimeField(auto_now_add=True)
+    date_of_registration = models.DateTimeField(auto_now_add=True) 
     medical_history = models.TextField(
         null=True, blank=True
     )
@@ -88,11 +88,9 @@ class Appointment(models.Model):
     appt_id = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=120)
     phone = models.CharField(
-        max_length=15,
-        unique=True,                  
+        max_length=15,                  
     )
     email = models.EmailField(
-        unique=True,
         null=False, blank=False       
     )
     department = models.CharField(
@@ -112,9 +110,7 @@ class Appointment(models.Model):
         choices=[
             ('pending', 'Pending'),
             ('confirmed', 'Confirmed'),
-            ('cancelled', 'Cancelled'),
             ('visited', 'Visited'),
-            ('no_show', 'No Show'),
         ],
         default='pending'
     )
