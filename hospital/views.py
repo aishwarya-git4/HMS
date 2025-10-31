@@ -22,8 +22,6 @@ def cancel_booking(request):
     else:
         return render(request,'cancel_booking.html')
 
-def manager(request):
-    return render(request,'manager.html')
 def doctor(request):
     """Doctor dashboard with consultation form"""
     staff_id = request.session.get("staff_id")
@@ -102,8 +100,6 @@ def staff_login(request):
 
         if role == "doctor":
             return redirect("doctor")
-        elif role == "manager":
-            return redirect("manager")
         else:
             return redirect("receptionist")
 

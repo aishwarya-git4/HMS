@@ -7,28 +7,28 @@ class Patient(models.Model):
         unique=True,                  
     )
     dob = models.DateField(
-        null=True, blank=True
+        null=False, blank=False
     )
     age = models.PositiveSmallIntegerField(
-        null=True, blank=True
+        null=False, blank=False
     )   
     gender = models.CharField(
         max_length=10,
         choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')],
-        null=True, blank=True
+        null=False, blank=False
     )
     address = models.TextField(
-        null=True, blank=True
+        null=False, blank=False
     )
     nationality = models.CharField(
         max_length=50,
-        null=True, blank=True
+        null=False, blank=False
     )
     occupation = models.CharField(
         max_length=100,
-        null=True, blank=True
+        null=False, blank=False
     )
-    date_of_registration = models.DateTimeField(auto_now_add=True)
+    date_of_registration = models.DateTimeField(auto_now_add=True) 
     medical_history = models.TextField(
         null=True, blank=True
     )
@@ -40,7 +40,7 @@ class Patient(models.Model):
             ('AB+', 'AB+'), ('AB-', 'AB-'),
             ('O+', 'O+'), ('O-', 'O-'),
         ],
-        null=True, blank=True
+        null=False, blank=False
     )
 
 class Staff(models.Model):
@@ -88,11 +88,9 @@ class Appointment(models.Model):
     appt_id = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=120)
     phone = models.CharField(
-        max_length=15,
-        unique=True,                  
+        max_length=15,                  
     )
     email = models.EmailField(
-        unique=True,
         null=False, blank=False       
     )
     department = models.CharField(
@@ -112,9 +110,7 @@ class Appointment(models.Model):
         choices=[
             ('pending', 'Pending'),
             ('confirmed', 'Confirmed'),
-            ('cancelled', 'Cancelled'),
             ('visited', 'Visited'),
-            ('no_show', 'No Show'),
         ],
         default='pending'
     )
@@ -152,13 +148,13 @@ class Consultation(models.Model):
     )
     visit_datetime = models.DateTimeField(auto_now_add=True)
     symptoms = models.TextField(
-        null=True, blank=True
+        null=False, blank=False
     )
     diagnosis = models.TextField(
-        null=True, blank=True
+        null=False, blank=False
     )
     prescription = models.TextField(
-        null=True, blank=True
+        null=False, blank=False
     )
     notes = models.TextField(
         null=True, blank=True
